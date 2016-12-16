@@ -263,7 +263,13 @@ class DiskStore(Store):
                 f.write(pickled)
             finally:
                 f.close()
-                os.rename(tname, path) # atomary operation
+                try:
+                    # http://stackoverflow.com/questions/8107352/force-overwrite-in-os-rename
+                    os.rename(tname, path) # atomary operation in *Nix
+                except WindowsError:
+                    from shutil import move
+                    os.remove(path)
+                    move(tname, path)
         except IOError:
             pass
 
