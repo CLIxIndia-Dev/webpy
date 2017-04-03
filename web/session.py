@@ -268,7 +268,11 @@ class DiskStore(Store):
                     os.rename(tname, path) # atomary operation in *Nix
                 except WindowsError:
                     from shutil import move
-                    os.remove(path)
+                    try:
+                        os.remove(path)
+                    except WindowsError:
+                        # The original file does not exist anymore
+                        pass
                     move(tname, path)
         except IOError:
             pass
